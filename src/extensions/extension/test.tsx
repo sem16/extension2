@@ -11,17 +11,16 @@ import {
 import {Convert} from './ConvertExcel';
 import { ListViewCommandSetContext } from '@microsoft/sp-listview-extensibility';
 import { sp } from '@pnp/sp-commonjs';
-
+import styles from './Extension.module.scss';
 
 interface testProps{
-  context: ListViewCommandSetContext;
   convert: Convert;
 }
 
 class Test extends React.Component<testProps,{}>{
   public render(): JSX.Element{
     return (
-      <DialogContent>
+      <DialogContent className={styles.alert}>
         <div>
           <p>insersci il file</p>
           <input type="file" id="fileUpload" onChange={e => this.props.convert.ConvertAndInsert(e)}></input>
@@ -40,9 +39,10 @@ export class FileDialog extends BaseDialog {
   }
   convert: Convert;
   public context: ListViewCommandSetContext;
+
   public render(){
     ReactDOM.render(
-      <Test context={this.context} convert={this.convert}></Test>
+      <Test  convert={this.convert}></Test>
     ,this.domElement);
   }
 }

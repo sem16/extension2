@@ -11,6 +11,7 @@ import {sp} from '@pnp/sp-commonjs';
 import * as strings from 'ExtensionCommandSetStrings';
 import * as React from 'react';
 import {FileDialog} from './test'
+
 /**
  * If your command set uses the ClientSideComponentProperties JSON input,
  * it will be deserialized into the BaseExtension.properties object.
@@ -42,38 +43,6 @@ export default class ExtensionCommandSet extends BaseListViewCommandSet<IExtensi
       compareOneCommand.visible = event.selectedRows.length === 1;
     }
   }
-
-  data = [{
-    Title: 'A',
-    NomeSocieta: 'A',
-    CFResponsabili: 'A',
-    NominativoResponsabili: 'A',
-    RuoloResponsabili: 'A',
-    },
-    {
-      Title: 'B',
-      NomeSocieta: 'B',
-      CFResponsabili: 'B',
-      NominativoResponsabili: 'B',
-      RuoloResponsabili: 'B',
-    },
-    {
-      Title: 'C',
-      NomeSocieta: 'C',
-      CFResponsabili: 'C',
-      NominativoResponsabili: 'C',
-      RuoloResponsabili: 'C',
-      }
-  ]
-
-
-  insertInList(object: object[]){
-    object.forEach(el => {
-      sp.web.lists.getByTitle(this.context.pageContext.list.title).items.add(el).then(res => console.log(res));
-    })
-
-  }
-
 
   @override
   public onExecute(event: IListViewCommandSetExecuteEventParameters): void {

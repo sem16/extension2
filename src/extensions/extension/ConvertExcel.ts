@@ -36,11 +36,25 @@ export class Convert{
  });
  }
 
- insertInList(object: {}){
+ insertInList(object: any){
    console.log(object);
 
-    sp.web.lists.getByTitle(this.context.pageContext.list.title).items.add(object).then(res => console.log(res));
+    sp.web.lists.getByTitle(this.context.pageContext.list.title).items.add(object)
+    .then(res => {console.log('succes'+res)},res => {
+      console.log('title: '+object.Title);
+      console.log('res'+res);
+      // const result = sp.web.lists.getByTitle(this.context.pageContext.list.title).items
+      // .filter(`FilterField1=Title&FilterValue1=${object.Title}`).get().then(res => console.log(result));
+      const result = sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getAll().then(res =>{
+        console.log(res);
+        res.forEach(el => {
+          if(object.Title === el.Title){
+            sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getById(el.ID).update(object);
+          }
+        })
 
+      });
+    });
 }
 
 ConvertAndInsert(fileUpload: React.ChangeEvent<HTMLInputElement>){
