@@ -1,4 +1,4 @@
-import { BaseDialog, Dialog,IDialogConfiguration } from '@microsoft/sp-dialog';
+import { BaseDialog, IDialogConfiguration } from '@microsoft/sp-dialog';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {
@@ -6,7 +6,9 @@ import {
   PrimaryButton,
   Button,
   DialogFooter,
-  DialogContent
+  Dialog,
+  DialogContent,
+  Fabric
 } from 'office-ui-fabric-react';
 import {Convert} from './ConvertExcel';
 import { ListViewCommandSetContext } from '@microsoft/sp-listview-extensibility';
@@ -17,19 +19,36 @@ interface testProps{
   convert: Convert;
 }
 
+
+
 class Test extends React.Component<testProps,{}>{
   public render(): JSX.Element{
     return (
-      <DialogContent className={styles.alert}>
+      <DialogContent>
         <div>
           <p>insersci il file</p>
           <input type="file" id="fileUpload" onChange={e => this.props.convert.ConvertAndInsert(e)}></input>
 
         </div>
+
+      <DialogFooter>
+
+      </DialogFooter>
       </DialogContent>
     );
   }
 }
+
+export function Custom(){
+  console.log('aaaaaaaaa');
+    return(
+    <Dialog hidden={false}>
+      <div>
+        <p>hello</p>
+      </div>
+    </Dialog>);
+}
+
 
 export class FileDialog extends BaseDialog {
   constructor(context:ListViewCommandSetContext){
@@ -39,10 +58,10 @@ export class FileDialog extends BaseDialog {
   }
   convert: Convert;
   public context: ListViewCommandSetContext;
-
   public render(){
     ReactDOM.render(
-      <Test  convert={this.convert}></Test>
+        <Test  convert={this.convert}></Test>
     ,this.domElement);
   }
 }
+

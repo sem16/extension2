@@ -2,6 +2,7 @@
 
 .alert{
   animation-name: dropDown 300ms ease-in-out forwards;
+  background-color: aqua !important;
 }
 @keyframes dropDown{
   0% { transform: translateY(0);}

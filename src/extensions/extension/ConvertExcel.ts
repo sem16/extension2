@@ -15,15 +15,15 @@ export class Convert{
   type: 'array'
   });
 
-  //get the name of First Sheet.
+
   var Sheet = workbook.SheetNames[0];
 
-  //Read all rows from First Sheet into an JSON array.
+
   var excelRows: any = XLSX.utils.sheet_to_json(workbook.Sheets[Sheet]);
-  // var excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[Sheet]);
+
   console.log(excelRows);
   const allowed: string[] = ['__rowNum__'];
-  //Create a HTML Table element.;
+
  let object: {};
  excelRows.forEach(el => {
     object =Object.keys(el).filter(key => allowed.indexOf(key)).reduce((obj, key) => {
@@ -40,20 +40,23 @@ export class Convert{
    console.log(object);
 
     sp.web.lists.getByTitle(this.context.pageContext.list.title).items.add(object)
-    .then(res => {console.log('succes'+res)},res => {
+    .then(res => {console.log('succes'+res)}, res => {
       console.log('title: '+object.Title);
       console.log('res'+res);
-      // const result = sp.web.lists.getByTitle(this.context.pageContext.list.title).items
-      // .filter(`FilterField1=Title&FilterValue1=${object.Title}`).get().then(res => console.log(result));
-      const result = sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getAll().then(res =>{
-        console.log(res);
-        res.forEach(el => {
-          if(object.Title === el.Title){
-            sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getById(el.ID).update(object);
-          }
-        })
-
-      });
+      sp.web.lists.getByTitle(this.context.pageContext.list.title).items
+        .filter(`Title eq '${object.Title}'`).get().then(res => {
+          console.log(res)
+          console.log(res[0].ID)
+          sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getById(res[0].ID).update(object);
+        });
+      // const result = sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getAll().then(res =>{
+      //   console.log(res);
+      //   res.forEach(el => {
+      //     if(object.Title === el.Title){
+      //       sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getById(el.ID).update(object);
+      //     }
+      //   })
+      // });
     });
 }
 
