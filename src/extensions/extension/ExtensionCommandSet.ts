@@ -10,7 +10,8 @@ import { Dialog } from '@microsoft/sp-dialog';
 import {sp} from '@pnp/sp-commonjs';
 import * as strings from 'ExtensionCommandSetStrings';
 import * as React from 'react';
-import {Custom, FileDialog} from './test'
+import {CustomDialog, FileDialog} from './ExtensionDialog'
+import * as ReactDOM from 'react-dom';
 
 /**
  * If your command set uses the ClientSideComponentProperties JSON input,
@@ -53,7 +54,8 @@ export default class ExtensionCommandSet extends BaseListViewCommandSet<IExtensi
       case 'COMMAND_2':
       const  dialog: FileDialog = new FileDialog(this.context);
       dialog.show();
-      Custom();
+      sp.web.lists.getByTitle(this.context.pageContext.list.title).get().then(res => console.log(res));
+      sp.web.lists.getByTitle(this.context.pageContext.list.title).fields.get().then(res => console.log(res));
       default:
         throw new Error('Unknown command');
     }

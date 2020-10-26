@@ -4,7 +4,7 @@
   "https": true,
   "serveConfigurations": {
     "default": {
-      "pageUrl": "https://pacedom.sharepoint.com/sites/SitoTest2/Lists/ListaTest/AllItems.aspx",
+      "pageUrl": "https://regmarg.sharepoint.com/sites/Quick/Lists/Cartadiidentita/AllItems.aspx",
       "customActions": {
         "adf62745-1995-4eaf-9121-d18eb0ec8b10": {
           "location": "ClientSideExtension.ListViewCommandSet.CommandBar",
@@ -16,7 +16,7 @@
       }
     },
     "extension": {
-      "pageUrl": "https://pacedom.sharepoint.com/sites/SitoTest2/Lists/ListaTest/AllItems.aspx",
+      "pageUrl": "https://regmarg.sharepoint.com/sites/Quick/Lists/Cartadiidentita/AllItems.aspx",
       "customActions": {
         "adf62745-1995-4eaf-9121-d18eb0ec8b10": {
           "location": "ClientSideExtension.ListViewCommandSet.CommandBar",
