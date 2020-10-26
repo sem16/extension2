@@ -38,12 +38,6 @@ export class ExportService {
     });
   }
 
-  moveIdFirst(sourceObj){
-    var temp = sourceObj[0];
-    sourceObj["ID"] = sourceObj[0];
-    sourceObj[0] = temp;
-  }
-
   public getService() {
       sp.web.lists
         .getByTitle(this.context.pageContext.list.title)
@@ -57,13 +51,4 @@ export class ExportService {
           console.log(res);
         });
   }
-}
-
-interface IFilters {
-  field: string;
-  checkboxes: any[];
-}
-
-interface Properties {
-  context: ListViewCommandSetContext;
 }

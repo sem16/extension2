@@ -54,8 +54,6 @@ export default class ExtensionCommandSet extends BaseListViewCommandSet<IExtensi
       case 'COMMAND_2':
       const  dialog: FileDialog = new FileDialog(this.context);
       dialog.show();
-      sp.web.lists.getByTitle(this.context.pageContext.list.title).get().then(res => console.log(res));
-      sp.web.lists.getByTitle(this.context.pageContext.list.title).fields.get().then(res => console.log(res));
       default:
         throw new Error('Unknown command');
     }
