@@ -10,8 +10,10 @@ import { Dialog } from '@microsoft/sp-dialog';
 import {sp} from '@pnp/sp-commonjs';
 import * as strings from 'ExtensionCommandSetStrings';
 import * as React from 'react';
-import {CustomDialog, FileDialog} from './ExtensionDialog'
+import {CustomDialog} from './ExtensionDialog'
 import * as ReactDOM from 'react-dom';
+import { Convert } from './ConvertExcel';
+import { ExportService } from './export-excel/exportService';
 
 /**
  * If your command set uses the ClientSideComponentProperties JSON input,
@@ -27,11 +29,12 @@ export interface IExtensionCommandSetProperties {
 const LOG_SOURCE: string = 'ExtensionCommandSet';
 
 
-
 export default class ExtensionCommandSet extends BaseListViewCommandSet<IExtensionCommandSetProperties> {
   @override
   public onInit(): Promise<void> {
     Log.info(LOG_SOURCE, 'Initialized ExtensionCommandSet');
+    sp.setup({pageContext: {web: {absoluteUrl: this.context.pageContext.web.absoluteUrl}}});
+    console.log(this.context);
     return Promise.resolve();
   }
 
@@ -52,8 +55,18 @@ export default class ExtensionCommandSet extends BaseListViewCommandSet<IExtensi
         Dialog.alert(`${this.properties.sampleTextOne}`);
         break;
       case 'COMMAND_2':
-      const  dialog: FileDialog = new FileDialog(this.context);
-      dialog.show();
+
+        const dialogPlaceHolder = document.body.appendChild(document.createElement("div"));
+        const element: React.ReactElement<{}> = React.createElement(
+          CustomDialog,{
+            hide: false,
+            convert: new Convert(this.context),
+            export: new ExportService(this.context)
+          }
+        );
+        ReactDOM.render(element,dialogPlaceHolder);
+        // const  dialog: FileDialog = new FileDialog(this.context);
+        // dialog.show();
       default:
         throw new Error('Unknown command');
     }

@@ -1,68 +1,159 @@
-import { ListViewCommandSetContext } from '@microsoft/sp-listview-extensibility';
-import { sp } from '@pnp/sp-commonjs';
-import * as XLSX from 'xlsx';
+import { ListViewCommandSetContext } from "@microsoft/sp-listview-extensibility";
+import { IFieldInfo, IFields, sp } from "@pnp/sp-commonjs";
+import * as XLSX from "xlsx";
 
-export class Convert{
-  constructor(context:ListViewCommandSetContext){
+export class Convert {
+  public context: ListViewCommandSetContext;
+  private title: string;
+  constructor(context: ListViewCommandSetContext) {
     this.context = context;
   }
-  public context: ListViewCommandSetContext;
 
   public async GetTableFromExcel(data) {
-  console.log(data.target.files.item(0).name)
-  const data1 = data = await data.target.files.item(0).arrayBuffer();
-  var workbook = XLSX.read(data1, {
-  type: 'array'
-  });
-
-
-  var Sheet = workbook.SheetNames[0];
-
-
-  var excelRows: any = XLSX.utils.sheet_to_json(workbook.Sheets[Sheet]);
-
-  console.log(excelRows);
-  const allowed: string[] = ['__rowNum__'];
-
- let object: {};
- excelRows.forEach(el => {
-    object =Object.keys(el).filter(key => allowed.indexOf(key)).reduce((obj, key) => {
-    obj[key] = el[key];
-    return obj;
-
-  }, {});
-  console.log(object);
-  this.insertInList(object);
- });
- }
-
- insertInList(object: any){
-   console.log(object);
-
-    sp.web.lists.getByTitle(this.context.pageContext.list.title).items.add(object)
-    .then(res => {console.log('succes'+res)}, res => {
-      console.log('title: '+object.Title);
-      console.log('res'+res);
-      sp.web.lists.getByTitle(this.context.pageContext.list.title).items
-        .filter(`Title eq '${object.Title}'`).get().then(res => {
-          console.log(res)
-          console.log(res[0].ID)
-          sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getById(res[0].ID).update(object);
-        });
-      // const result = sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getAll().then(res =>{
-      //   console.log(res);
-      //   res.forEach(el => {
-      //     if(object.Title === el.Title){
-      //       sp.web.lists.getByTitle(this.context.pageContext.list.title).items.getById(el.ID).update(object);
-      //     }
-      //   })
-      // });
+    //legge il file excel
+    console.log(data.target.files.item(0).name);
+    const data1 = (data = await data.target.files.item(0).arrayBuffer());
+    var workbook = XLSX.read(data1, {
+      type: "array",
     });
+
+    //estrae i dati dal file e gli inserisce in excelRows
+    var Sheet = workbook.SheetNames[0];
+    var excelRows: any = XLSX.utils.sheet_to_json(workbook.Sheets[Sheet]);
+    console.log(excelRows);
+    const allowed: string[] = ["__rowNum__"];
+
+    //filtra ed inserisce nel array object i dati elimindano la proprieta 'rowNum'
+    let object: {}[] = [];
+    excelRows.forEach((el) => {
+      object.push(
+        Object.keys(el)
+          .filter((key) => allowed.indexOf(key))
+          .reduce((obj, key) => {
+            obj[key] = el[key];
+            return obj;
+          }, {})
+      );
+      console.log(object);
+    });
+    //converte il titolo delle colonne ad nomi interni
+    console.log(object);
+    return object;
+  }
+
+  insertInList(object: any[]) {
+    console.log(object);
+    //va sistemato il fatto che se c è un qualunque errore fa un aggiornamento
+    object.forEach((object) => {
+      sp.web.lists
+        .getByTitle(this.title)
+        .items.add(object)
+        .then(
+          (res) => {
+            console.log("succes" + res);
+          },
+          (res) => {
+            console.log("res" + res);
+            if(object['Modificato'].toLowerCase() === 'sì'){
+              delete object['Modificato'];
+              sp.web.lists
+                .getByTitle(this.title)
+                .items.filter(`Id eq '${parseInt(object.Id)}'`)
+                .get()
+                .then((res) => {
+                  console.log(res);
+                  console.log(res[0].Id);
+                  sp.web.lists
+                    .getByTitle(this.title)
+                    .items.getById(res[0].ID)
+                    .update(object);
+                });
+            }
+          }
+        );
+    });
+  }
+
+    async fixNameAndType(object: any[]){
+      object.forEach((el) => {
+        if(el['Modificato'] === undefined){
+          delete el['Modificato'];
+        }
+      })
+
+      await sp.web.lists
+      .getByTitle(this.title)
+      .fields.get()
+      .then((fields) => {
+        console.log(fields)
+        fields.forEach((field) => {
+          object.forEach((el) => {
+            Object.keys(el).forEach((key) => {
+              if (field.Title === key) {
+                if(field.InternalName !== key){
+                  el[field.InternalName] = el[key];
+                  delete el[key];
+                }
+
+                switch (field.TypeAsString) {
+                  case 'Boolean':
+                    try{
+                      switch (el[field.InternalName].toLowerCase()) {
+                        case 'sì' || 'si' || 'true' || 'yes':
+                          el[field.InternalName] = true;
+                          break;
+                        case 'no ':
+                          el[field.InternalName] = false;
+                          break;
+                        default:
+                          break;
+                      }
+                    }catch(e){
+                      throw new Error(`errore nel campo ${key}; puo avere solo valori si/no` + e)
+                    }
+
+                    break;
+                  case 'DateTime':
+                    if(typeof el[field.InternalName] === 'string'){
+                      let splitedDate = el[field.InternalName].split('/');
+                      let date: Date = new Date();
+                      date.setFullYear(
+                        splitedDate[2],
+                        splitedDate[1]-1,
+                        splitedDate[0]);
+                      el[field.InternalName]  = date;
+                    }else{
+                      el[field.InternalName] = new Date((el[field.InternalName] - (25567 + 1))*86400*1000);
+                    }
+
+                    break;
+                  case 'Choice':
+                    console.log(Object.keys(field)['Choices'])
+                    break;
+                  default:
+                    break;
+                }
+                console.log(object);
+              }
+            });
+          });
+        });
+      });
+      return object;
+    }
+
+  ConvertAndInsert(fileUpload: React.ChangeEvent<HTMLInputElement>) {
+    console.log(this.context);
+    // this.title = this.context.dynamicDataProvider.getAvailableSources()[1].metadata.title;
+    this.title = this.context.pageContext.list.title;
+    console.log(this.title);
+    this.GetTableFromExcel(fileUpload).then((result) =>
+      this.fixNameAndType(result).then(fixed =>
+         {this.insertInList(fixed)
+         console.log(fixed)}
+         )
+    );
+  }
 }
 
-ConvertAndInsert(fileUpload: React.ChangeEvent<HTMLInputElement>){
-  console.log(this.context.pageContext.list.title)
-  this.GetTableFromExcel(fileUpload);
-}
-}
 

@@ -17,6 +17,7 @@
     "@microsoft/sp-dialog": "1.11.0",
     "@microsoft/sp-listview-extensibility": "1.11.0",
     "@pnp/sp-commonjs": "^2.0.10",
+    "@types/node": "^14.14.5",
     "node-xlsx": "^0.15.0",
     "xlsx": "^0.16.7"
   },

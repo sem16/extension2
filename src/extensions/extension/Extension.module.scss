@@ -1,11 +1,15 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .alert{
-  animation-name: dropDown 300ms ease-in-out forwards;
-  background-color: aqua !important;
+  animation: fadein 300ms ease-in;
+  background-color: whitesmoke;
 }
-@keyframes dropDown{
-  0% { transform: translateY(0);}
-  100% { transform: translateY(40);}
+.alertBackground{
+  background-color: rgba(134, 143, 148, 0.3);
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 

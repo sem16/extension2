@@ -25,7 +25,6 @@ export class ExportService {
 
     }
     jsonList.forEach((column) => {
-      sp.web.lists.getByTitle(this.context.pageContext.list.title).fields.get();
       fields.forEach((res) => {
         keys = Object.keys(column);
         keys.forEach((el) => {
@@ -46,7 +45,7 @@ export class ExportService {
         .then((res) => {
           console.log(res)
           this.cheangeColumnName(res).then(() =>
-            ConvertToXlsx.convertToXslx(res)
+            ConvertToXlsx.convertToXslx(res,'test')
           );
           console.log(res);
         });

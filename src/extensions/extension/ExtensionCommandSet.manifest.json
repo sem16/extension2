@@ -22,9 +22,9 @@
       "type": "command"
     },
     "COMMAND_2": {
-      "title": { "default": "Command Two" },
+      "title": { "default": "Quick Import" },
       "iconImageUrl": "icons/cancel.png",
-      "type": "command"
+      "type": "command",
     }
   }
 }
