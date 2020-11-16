@@ -24,7 +24,7 @@
     "COMMAND_2": {
       "title": { "default": "Quick Import" },
       "iconImageUrl": "icons/cancel.png",
-      "type": "command",
+      "type": "command"
     }
   }
 }

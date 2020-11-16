@@ -3,6 +3,9 @@
 .alert{
   animation: fadein 300ms ease-in;
   background-color: whitesmoke;
+  select{
+    min-width: 235px;
+  }
 }
 .alertBackground{
   background-color: rgba(134, 143, 148, 0.3);

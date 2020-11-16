@@ -7,7 +7,7 @@ import {
   IListViewCommandSetExecuteEventParameters
 } from '@microsoft/sp-listview-extensibility';
 import { Dialog } from '@microsoft/sp-dialog';
-import {sp} from '@pnp/sp-commonjs';
+import {IViewInfo, sp, ViewScope} from '@pnp/sp-commonjs';
 import * as strings from 'ExtensionCommandSetStrings';
 import * as React from 'react';
 import {CustomDialog} from './ExtensionDialog'
@@ -48,25 +48,31 @@ export default class ExtensionCommandSet extends BaseListViewCommandSet<IExtensi
   }
 
   @override
-  public onExecute(event: IListViewCommandSetExecuteEventParameters): void {
-
+  public async onExecute(event: IListViewCommandSetExecuteEventParameters){
     switch (event.itemId) {
       case 'COMMAND_1':
         Dialog.alert(`${this.properties.sampleTextOne}`);
         break;
       case 'COMMAND_2':
-
         const dialogPlaceHolder = document.body.appendChild(document.createElement("div"));
+        const lists = await sp.web.lists.filter('(hidden eq false) and (BaseTemplate eq 100)').get();
+        // let views: IViewInfo[][] = [];
+        // views = await Promise.all(lists.map(list => (sp.web.lists.getById(list.Id).views.select('Title').get())));
+        // for(let i = 0; i < lists.length; i++){
+        //   views[i] = sp.web.lists.getById(lists[i].Id).views.select('Title').get();
+        // }
+        // console.log(views)
         const element: React.ReactElement<{}> = React.createElement(
           CustomDialog,{
             hide: false,
             convert: new Convert(this.context),
-            export: new ExportService(this.context)
+            export: new ExportService(this.context),
+            lists: lists,
+            // views: views
           }
         );
         ReactDOM.render(element,dialogPlaceHolder);
-        // const  dialog: FileDialog = new FileDialog(this.context);
-        // dialog.show();
+        break;
       default:
         throw new Error('Unknown command');
     }
