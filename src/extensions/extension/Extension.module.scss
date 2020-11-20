@@ -1,12 +1,40 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
 
 .alert{
+  max-width: 100%;
+  width : 460px;
+  max-height: 100%;
+  height : 380px;
   animation: fadein 300ms ease-in;
   background-color: whitesmoke;
   select{
     min-width: 235px;
   }
 }
+
+.import{
+  display: inline-block;
+  padding: 0.7em 1.7em;
+  margin: 0 0.3em 0.3em 0;
+  border-radius: 0.2em;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-family: 'Roboto',sans-serif;
+  font-weight: 400;
+  color: #FFFFFF;
+  background-color: #3369ff;
+  box-shadow: inset 0 -0.6em 1em -0.35em rgba(0,0,0,0.17), inset 0 0.6em 2em -0.3em rgba(255,255,255,0.15), inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+  text-align: center;
+  position: relative;
+  margin-left: 40%;
+  margin-top: 13%;
+  border: 0px;
+  :active{
+    box-shadow: inset 0 0.6em 2em -0.3em rgba(0,0,0,0.15),inset 0 0 0em 0.05em rgba(255,255,255,0.12);
+  }
+
+}
+
 .alertBackground{
   background-color: rgba(134, 143, 148, 0.3);
 }
@@ -16,3 +44,41 @@
   to   { opacity: 1; }
 }
 
+
+.dragAndDrop{
+  height: 100px;
+  width: auto;
+  background-color: #FFFFFF;
+  text-align: center;
+  text-justify: center;
+  font-size: medium;
+  border: 2px solid #ffffff00;
+  margin-top: 7%;
+  p{
+    margin-top: 9%;
+    position: relative;
+    color: rgba(201, 201, 197 , 0.72);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+}
+
+.fileInput{
+  margin-top: 10px;
+  float: left;
+  font-size: 14px;
+  margin-left: 35%;
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
+  color: rgb(50, 171, 231);
+  text-decoration: underline;
+  cursor: pointer;
+  :hover{
+    color: #069;
+  }
+}

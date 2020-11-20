@@ -9,10 +9,11 @@ export class ConvertToXlsx {
     let cols;
     const sheet = XLSX.utils.json_to_sheet(json);
     const workbook = XLSX.utils.book_new();
-    cols =   Object.keys(json[0]).map(key => ({wch: this.fitToColumn(key,json,key.length)}))
+    cols =   Object.keys(json[0]).map(key => ({wch: this.fitToColumn(key,json,key.length)}));
     sheet['!cols'] = cols;
+    sheet['!cols'][0].hidden = true;
     sheet['!rows'] = [{hpx: 28}];
-    console.log(sheet["!cols"])
+    console.log(sheet["!cols"]);
     XLSX.utils.book_append_sheet(workbook, sheet);
     const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
     saveAs(

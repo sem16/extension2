@@ -4,15 +4,28 @@ import * as XLSX from "xlsx";
 
 export class Convert {
   public context: ListViewCommandSetContext;
-  private title: string;
+  public title: string;
   constructor(context: ListViewCommandSetContext) {
     this.context = context;
   }
-
+  private async shouldBeUpdated(newItem){
+    const keys = Object.keys(newItem);
+    const item = await sp.web.lists.getByTitle(this.title).items.select(...keys).get();
+    let temp: boolean;
+    console.log(keys);
+    console.log(item);
+    item.forEach(el => {
+      console.log('item: ' + el + 'newItem' + newItem[el]);
+      if(el !== newItem[el]){
+        temp = true;
+      }
+    });
+    return temp;
+  }
   public async GetTableFromExcel(data) {
     //legge il file excel
-    console.log(data.target.files.item(0).name);
-    const data1 = (data = await data.target.files.item(0).arrayBuffer());
+    console.log(data.item(0).name);
+    const data1 = (data = await data.item(0).arrayBuffer());
     var workbook = XLSX.read(data1, {
       type: "array",
     });
@@ -41,36 +54,44 @@ export class Convert {
     return object;
   }
 
-  insertInList(object: any[]) {
-    console.log(object);
-    //va sistemato il fatto che se c è un qualunque errore fa un aggiornamento
-    object.forEach((object) => {
-      sp.web.lists
+  public insertInList(objects: any[]) {
+
+    console.log(objects);
+
+    objects.forEach((object,i) => {
+      this.shouldBeUpdated(object).then(res =>
+      {if(res){
+        console.log('modif',i);
+      }
+    });
+
+      if(object['Modificato'] === undefined || null){
+        delete object['Modificato'];
+        sp.web.lists
         .getByTitle(this.title)
         .items.add(object)
         .then(
           (res) => {
             console.log("succes" + res);
-          },
-          (res) => {
-            console.log("res" + res);
-            if(object['Modificato'].toLowerCase() === 'sì'){
-              delete object['Modificato'];
-              sp.web.lists
-                .getByTitle(this.title)
-                .items.filter(`Id eq '${parseInt(object.Id)}'`)
-                .get()
-                .then((res) => {
-                  console.log(res);
-                  console.log(res[0].Id);
-                  sp.web.lists
-                    .getByTitle(this.title)
-                    .items.getById(res[0].ID)
-                    .update(object);
-                });
-            }
-          }
-        );
+        });
+      }
+      else if(object['Modificato'].toLowerCase() === 'no'){
+        delete objects[object];
+      }else if (object['Modificato'].toLowerCase() === 'sì' || 'si'){
+      delete object['Modificato'];
+        sp.web.lists
+          .getByTitle(this.title)
+          .items.filter(`Id eq '${parseInt(object.Id)}'`)
+          .get()
+          .then((res) => {
+            console.log(res);
+            console.log(res[0].Id);
+            sp.web.lists
+              .getByTitle(this.title)
+              .items.getById(res[0].ID)
+              .update(object);
+        });
+      }
     });
   }
 
@@ -145,8 +166,8 @@ export class Convert {
   ConvertAndInsert(fileUpload: React.ChangeEvent<HTMLInputElement>) {
     console.log(this.context);
     // this.title = this.context.dynamicDataProvider.getAvailableSources()[1].metadata.title;
-    this.title = this.context.pageContext.list.title;
-    console.log(this.title);
+    // this.title = this.context.pageContext.list.title;
+    // console.log(this.title);
     this.GetTableFromExcel(fileUpload).then((result) =>
       this.fixNameAndType(result).then(fixed =>
          {this.insertInList(fixed)
