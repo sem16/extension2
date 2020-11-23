@@ -8,20 +8,6 @@ export class Convert {
   constructor(context: ListViewCommandSetContext) {
     this.context = context;
   }
-  private async shouldBeUpdated(newItem){
-    const keys = Object.keys(newItem);
-    const item = await sp.web.lists.getByTitle(this.title).items.select(...keys).get();
-    let temp: boolean;
-    console.log(keys);
-    console.log(item);
-    item.forEach(el => {
-      console.log('item: ' + el + 'newItem' + newItem[el]);
-      if(el !== newItem[el]){
-        temp = true;
-      }
-    });
-    return temp;
-  }
   public async GetTableFromExcel(data) {
     //legge il file excel
     console.log(data.item(0).name);
@@ -32,18 +18,19 @@ export class Convert {
 
     //estrae i dati dal file e gli inserisce in excelRows
     var Sheet = workbook.SheetNames[0];
-    var excelRows: any = XLSX.utils.sheet_to_json(workbook.Sheets[Sheet]);
+    var excelRows: any = XLSX.utils.sheet_to_json(workbook.Sheets[Sheet],{defval: null});
     console.log(excelRows);
     const allowed: string[] = ["__rowNum__"];
 
     //filtra ed inserisce nel array object i dati elimindano la proprieta 'rowNum'
     let object: {}[] = [];
-    excelRows.forEach((el) => {
+    excelRows.forEach((row) => {
+
       object.push(
-        Object.keys(el)
+        Object.keys(row)
           .filter((key) => allowed.indexOf(key))
           .reduce((obj, key) => {
-            obj[key] = el[key];
+            obj[key] = row[key];
             return obj;
           }, {})
       );
@@ -59,14 +46,9 @@ export class Convert {
     console.log(objects);
 
     objects.forEach((object,i) => {
-      this.shouldBeUpdated(object).then(res =>
-      {if(res){
-        console.log('modif',i);
-      }
-    });
-
-      if(object['Modificato'] === undefined || null){
+      if(object['Modificato'] === undefined || object['Modificato'] === null){
         delete object['Modificato'];
+        delete object['Id'];
         sp.web.lists
         .getByTitle(this.title)
         .items.add(object)
@@ -135,25 +117,38 @@ export class Convert {
 
                     break;
                   case 'DateTime':
-                    if(typeof el[field.InternalName] === 'string'){
-                      let splitedDate = el[field.InternalName].split('/');
-                      let date: Date = new Date();
-                      date.setFullYear(
-                        splitedDate[2],
-                        splitedDate[1]-1,
-                        splitedDate[0]);
-                      el[field.InternalName]  = date;
-                    }else{
-                      el[field.InternalName] = new Date((el[field.InternalName] - (25567 + 1))*86400*1000);
+                    if(el[field.InternalName] !== null){
+                        if(typeof el[field.InternalName] === 'string'){
+                        let splitedDate = el[field.InternalName].split('/');
+                        let date: Date = new Date();
+                        date.setFullYear(
+                          splitedDate[2],
+                          splitedDate[1]-1,
+                          splitedDate[0]);
+                        el[field.InternalName]  = date;
+                      }else{
+                        el[field.InternalName] = new Date((el[field.InternalName] - (25567 + 1))*86400*1000);
+                      }
                     }
-
                     break;
+
                   case 'Choice':
                     console.log(Object.keys(field)['Choices'])
                     break;
+
+                  case 'URL':
+                    if(el[field.InternalName] === ''){
+                      el[field.InternalName] = null;
+                    }else{
+                      el[field.InternalName] = {__metadata: { "type": "SP.FieldUrlValue" },
+                      Url: el[field.InternalName]
+                      };
+                    }
+                    break;
+
                   default:
                     break;
-                }
+                  }
                 console.log(object);
               }
             });

@@ -62,7 +62,7 @@ export default class ExtensionCommandSet extends BaseListViewCommandSet<IExtensi
         catch{}
         row.fields.forEach((field) => {
           let keyName = field.displayName;
-          values[keyName]  = row.getValue(field)
+          values[keyName]  = row.getValue(field);
         });
         if(values['Nome società'] === undefined){
           delete values['Nome società'];

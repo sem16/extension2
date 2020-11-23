@@ -17,7 +17,6 @@ interface CustomDialogProps{
   convert: Convert;
   export: ConvertToXlsx;
   lists: IListInfo[];
-  // views: IViewInfo[][];
 }
 export class CustomDialog extends React.Component<CustomDialogProps, {}>{
   private file: FileList;
@@ -46,11 +45,6 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
   }
   public render(): JSX.Element{
     console.log(this.props.lists);
-    // let option = (T) => {
-    //   return <option key={T.Title}>
-    //     {T.Title}
-    //   </option>;
-    // };
     let optionGroup = (T,i) => {return (<optgroup label={T.Title}>
       {this.state.views !== undefined ?
         this.state.views[i].map(view => (
@@ -68,7 +62,7 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
           dialogContentProps={this.dialogContentProps}
           modalProps={this.modalprops}
           onDismiss={() => this.setState({show: true})}>
-
+          <p className={styles.warning}>Prima di selezionare il file con i contenuti da importare, selezionare una o più righe della lista e cliccare su "Admin Export".</p>
           <div className={styles.dragAndDrop}
           onDrop={e => {
             e.preventDefault()
@@ -98,25 +92,3 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
   }
 }
 
-// interface ViewSelectInterface{
-//   lists: IListInfo[];
-//   views: IViewInfo[];
-// }
-
-// class ViewSelect extends React.Component<{},{}>{
-//   componentDidMount(){}
-//   public render(): JSX.Element {
-//     let option = (T) => {return <option key={T.Title}>{T.Title}</option>}
-//     let optionGroup = (T,i) => {return (<optgroup label={T.Title}>
-//       {this.state.views[i].map(option)}
-//       </optgroup>);
-//     };
-//     return (
-//       <>
-//         <select>
-//         {this.props.lists.map(optionGroup)}
-//         </select>
-//       </>
-//     );
-//   }
-// }
