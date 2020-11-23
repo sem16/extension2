@@ -163,7 +163,7 @@ export class Convert {
       return object;
     }
 
-  ConvertAndInsert(fileUpload: React.ChangeEvent<HTMLInputElement>) {
+  ConvertAndInsert(fileUpload) {
     console.log(this.context);
     // this.title = this.context.dynamicDataProvider.getAvailableSources()[1].metadata.title;
     // this.title = this.context.pageContext.list.title;

@@ -20,6 +20,8 @@ interface CustomDialogProps{
   // views: IViewInfo[][];
 }
 export class CustomDialog extends React.Component<CustomDialogProps, {}>{
+  private file: FileList;
+
   public state= {
     show: this.props.hide,
     views: undefined,
@@ -44,7 +46,6 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
   }
   public render(): JSX.Element{
     console.log(this.props.lists);
-    let file;
     // let option = (T) => {
     //   return <option key={T.Title}>
     //     {T.Title}
@@ -71,9 +72,9 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
           <div className={styles.dragAndDrop}
           onDrop={e => {
             e.preventDefault()
-            file = e.dataTransfer.files;
+            this.file = e.dataTransfer.files;
             e.currentTarget.style.border = '2px solid #ffffff00';
-            this.setState({message: e.dataTransfer.files[0].name});
+            this.setState({message: this.file[0].name});
           }}
           onDragOver={e => {e.preventDefault(); e.currentTarget.style.border = '2px solid #3369ff';}}
           onDragLeave={e => {e.preventDefault(); e.currentTarget.style.border = '2px solid #ffffff00';} }
@@ -83,12 +84,14 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
 
           <input type="file"
           id="fileUpload"
-          onChange={e => file = e.target.files} style ={{display: 'none'}}/>
+          onChange={e => {this.file = e.target.files;
+            this.setState({message: this.file[0].name})}}
+          style ={{display: 'none'}}/>
 
           <button onClick={() => document.getElementById('fileUpload').click()} className={styles.fileInput}>oppure scegli un file</button>
           {/* <select onChange={e => this.props.convert.title = e.target.value}>{this.props.lists.map(optionGroup)}</select> */}
 
-          <button onClick={() => this.props.convert.ConvertAndInsert(file) } className={styles.import}>import</button>
+          <button onClick={() => this.props.convert.ConvertAndInsert(this.file) } className={styles.import}>import</button>
         </Dialog>
       </>
     );
