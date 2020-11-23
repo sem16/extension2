@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 export class Convert {
   public context: ListViewCommandSetContext;
   public title: string;
+  public errors: any[] = [];
   constructor(context: ListViewCommandSetContext) {
     this.context = context;
   }
@@ -71,7 +72,7 @@ export class Convert {
             sp.web.lists
               .getByTitle(this.title)
               .items.getById(res[0].ID)
-              .update(object);
+              .update(object).catch(err => {this.errors.push(object); console.log(this.errors);});
         });
       }
     });
@@ -145,7 +146,15 @@ export class Convert {
                       };
                     }
                     break;
-
+                  case 'Number':
+                    if(el[field.InternalName] === ''){
+                      el[field.InternalName] = null;
+                    }else{
+                      try{
+                        el[field.InternalName] =  parseInt(el[field.InternalName]);
+                      }catch(e){}
+                    }
+                    break;
                   default:
                     break;
                   }
