@@ -2,9 +2,9 @@
 
 .alert{
   max-width: 100%;
-  width : 480px;
-  max-height: 100%;
-  height : 400px;
+  width : 535px;
+  max-height: 700px;
+  height : fit-content;
   animation: fadein 300ms ease-in;
   background-color: whitesmoke;
   select{
@@ -86,4 +86,12 @@
 .warning{
   font-size: 11px;
   text-align: center;
+}
+
+.status{
+  color: red;
+  font-size: 12px;
+  align-items: center;
+  width: 445px;
+  word-wrap: break-word;
 }

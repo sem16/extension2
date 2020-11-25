@@ -24,7 +24,10 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
   public state= {
     show: this.props.hide,
     views: undefined,
-    message: 'trascina un file qui'
+    message: 'trascina un file qui',
+    errors: Object.keys(this.props.convert.errors),
+    okay: 0,
+    hideErrors: true
   };
 
   private dialogContentProps = {
@@ -38,11 +41,11 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
     className: styles.alertBackground
 
   };
-  public async  componentDidMount(){
-    let views: IViewInfo[][] = [];
-    views = await Promise.all(this.props.lists.map(list => (sp.web.lists.getById(list.Id).select('Title').views.get())));
-    this.setState({views: views});
-  }
+  // public async  componentDidMount(){
+  //   let views: IViewInfo[][] = [];
+  //   views = await Promise.all(this.props.lists.map(list => (sp.web.lists.getById(list.Id).select('Title').views.get())));
+  //   this.setState({views: views});
+  // }
   public render(): JSX.Element{
     console.log(this.props.lists);
     let optionGroup = (T,i) => {return (<optgroup label={T.Title}>
@@ -78,15 +81,32 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
 
           <input type="file"
           id="fileUpload"
-          onChange={e => {this.file = e.target.files;
-            this.setState({message: this.file[0].name})}}
+          onChange={e => {
+            this.file = e.target.files;
+            this.setState({message: this.file[0].name});
+          }}
           style ={{display: 'none'}}/>
 
-          <button onClick={() => document.getElementById('fileUpload').click()} className={styles.fileInput}>oppure scegli un file</button>
-          {/* <select onChange={e => this.props.convert.title = e.target.value}>{this.props.lists.map(optionGroup)}</select> */}
+          <button onClick={() => document.getElementById('fileUpload').click()}
+           className={styles.fileInput}>oppure scegli un file</button>
 
-          <button onClick={() => this.props.convert.ConvertAndInsert(this.file) } className={styles.import}>import</button>
+          <button onClick={() => {
+            this.props.convert.ConvertAndInsert(this.file)
+            .then(res => {
+              this.setState({okay: res[0]});
+              this.setState({errors: res[1]});
+              this.setState({hideErrors: false});
+          });
+
+          }}
+           className={styles.import}>import</button>
+          <p  className={styles.status} hidden={this.state.hideErrors}>
+            {`riusciti: ${this.state.okay} `} {this.props.convert.length !== undefined ? `/ ${this.props.convert.length }` : null}
+            <br/>
+            {`errore durante l inserimento delle seguenti righe: ${this.state.errors}`}
+          </p>
         </Dialog>
+
       </>
     );
   }
