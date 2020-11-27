@@ -1,5 +1,5 @@
 import { ListViewCommandSetContext } from "@microsoft/sp-listview-extensibility";
-import { IFieldInfo, IFields, sp } from "@pnp/sp-commonjs";
+import {  sp } from "@pnp/sp-commonjs";
 import * as XLSX from "xlsx";
 
 export class Convert {
@@ -49,6 +49,7 @@ export class Convert {
 
   public async insertInList(objects: any[]) {
     console.log(objects);
+    this.errors = [];
     for (let i = 0; i < objects.length; i++) {
       let object = objects[i];
       if (object["Modificato"] === undefined || object["Modificato"] === null) {
@@ -60,7 +61,7 @@ export class Convert {
           res = await item.items.add(object);
         }catch(e){
           console.log(e);
-          this.errors.push(object);
+          this.errors[i] = object;
           this.success -= 1;
           continue;
         }
@@ -86,7 +87,7 @@ export class Convert {
             .update(object);
         }catch(e){
           console.log(e);
-          this.errors.push(object);
+          this.errors[i] = object;
           console.log(this.errors);
           this.success -= 1;
           continue;
@@ -94,7 +95,7 @@ export class Convert {
         if (result !== undefined) {
           console.log(result);
         } else {
-          this.errors.push(object);
+          this.errors[i] = object;
           console.log(this.errors);
           this.success -= 1;
         }
@@ -145,7 +146,11 @@ export class Convert {
 
                     break;
                   case "DateTime":
+                    if(el[field.InternalName] === ""){
+                      el[field.InternalName] = null;
+                    }
                     if (el[field.InternalName] !== null) {
+
                       if (typeof el[field.InternalName] === "string") {
                         let splitedDate = el[field.InternalName].split("/");
                         let date: Date = new Date();
@@ -160,6 +165,9 @@ export class Convert {
                           (el[field.InternalName] - (25567 + 1)) * 86400 * 1000
                         );
                       }
+                    }
+                    if(isNaN(el[field.InternalName])){
+                      el[field.InternalName] = 'Darai errore';
                     }
                     break;
 

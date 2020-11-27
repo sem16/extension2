@@ -1,15 +1,11 @@
-import { BaseDialog, IDialogConfiguration } from '@microsoft/sp-dialog';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import {
   Dialog,
   DialogType
 } from 'office-ui-fabric-react';
 import {Convert} from './ConvertExcel';
-import { ListViewCommandSetContext } from '@microsoft/sp-listview-extensibility';
 import { IListInfo, IViewInfo, Lists, sp } from '@pnp/sp-commonjs';
 import styles from './Extension.module.scss';
-import {BaseClientSideWebPart} from '@microsoft/sp-webpart-base';
 import { ConvertToXlsx } from './ConvertToXlsx';
 
 interface CustomDialogProps{
@@ -41,11 +37,6 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
     className: styles.alertBackground
 
   };
-  // public async  componentDidMount(){
-  //   let views: IViewInfo[][] = [];
-  //   views = await Promise.all(this.props.lists.map(list => (sp.web.lists.getById(list.Id).select('Title').views.get())));
-  //   this.setState({views: views});
-  // }
   public render(): JSX.Element{
     console.log(this.props.lists);
     let optionGroup = (T,i) => {return (<optgroup label={T.Title}>
@@ -103,7 +94,7 @@ export class CustomDialog extends React.Component<CustomDialogProps, {}>{
           <p  className={styles.status} hidden={this.state.hideErrors}>
             {`riusciti: ${this.state.okay} `} {this.props.convert.length !== undefined ? `/ ${this.props.convert.length }` : null}
             <br/>
-            {`errore durante l inserimento delle seguenti righe: ${this.state.errors}`}
+            {this.state.errors.length > 0 ? `errore durante l inserimento delle seguenti righe: ${this.state.errors}` : null}
           </p>
         </Dialog>
 

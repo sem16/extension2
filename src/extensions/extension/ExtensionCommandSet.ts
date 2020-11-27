@@ -6,9 +6,7 @@ import {
   IListViewCommandSetListViewUpdatedParameters,
   IListViewCommandSetExecuteEventParameters,
 } from "@microsoft/sp-listview-extensibility";
-import { Dialog } from "@microsoft/sp-dialog";
-import { IViewInfo, PermissionKind, sp, ViewScope } from "@pnp/sp-commonjs";
-import * as strings from "ExtensionCommandSetStrings";
+import {  PermissionKind, sp} from "@pnp/sp-commonjs";
 import * as React from "react";
 import { CustomDialog } from "./ExtensionDialog";
 import * as ReactDOM from "react-dom";
@@ -33,30 +31,37 @@ export default class ExtensionCommandSet extends BaseListViewCommandSet<
   private data: {}[];
   private hideAll: boolean;
   @override
-  public async onInit(): Promise<void> {
+  public  async onInit(): Promise<void> {
     Log.info(LOG_SOURCE, "Initialized ExtensionCommandSet");
-    if (! await sp.web.currentUserHasPermissions(PermissionKind.ManageWeb)) {
+    sp.setup({
+      pageContext: {
+        web: { absoluteUrl: this.context.pageContext.web.absoluteUrl },
+      },
+    });
+
+    try{
+    console.log('nel try');
+    console.log(await sp.web.currentUserHasPermissions(PermissionKind.ManageWeb));
+    const isAdmin = await sp.web.currentUserHasPermissions(PermissionKind.ManageWeb);
+    if (!isAdmin) {
+      console.log('ok')
       const exportCommand: Command = this.tryGetCommand("COMMAND_1");
       const importCommand: Command = this.tryGetCommand("COMMAND_2");
       exportCommand.visible = false;
       importCommand.visible = false;
       this.hideAll = true;
     }
-    sp.setup({
-      pageContext: {
-        web: { absoluteUrl: this.context.pageContext.web.absoluteUrl },
-      },
-    });
+    }catch(e) {}
+
     console.log(this.context);
     return Promise.resolve();
   }
+
 
   @override
   public onListViewUpdated(
     event: IListViewCommandSetListViewUpdatedParameters
   ){
-    sp.web.currentUserHasPermissions(PermissionKind.ApproveItems).then(res => console.log(res));
-    sp.web.currentUserHasPermissions(PermissionKind.ManageWeb).then(res => console.log(res));
     if (!this.hideAll) {
       const compareOneCommand: Command = this.tryGetCommand("COMMAND_1");
       if (compareOneCommand) {
@@ -148,12 +153,7 @@ export default class ExtensionCommandSet extends BaseListViewCommandSet<
             listTitle = this.context.pageContext.list.title;
           }
           console.log(listTitle);
-          // let views: IViewInfo[][] = [];
-          // views = await Promise.all(lists.map(list => (sp.web.lists.getById(list.Id).views.select('Title').get())));
-          // for(let i = 0; i < lists.length; i++){
-          //   views[i] = sp.web.lists.getById(lists[i].Id).views.select('Title').get();
-          // }
-          // console.log(views)
+
           const convert: Convert = new Convert(this.context);
           convert.title = listTitle;
           const element: React.ReactElement<{}> = React.createElement(
