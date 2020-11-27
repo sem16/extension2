@@ -126,6 +126,9 @@ export class Convert {
                   delete el[key];
                 }
 
+              if( el[field.InternalName] === ""){
+                el[field.InternalName] = field.DefaultValue;
+              }
                 switch (field.TypeAsString) {
                   case "Boolean":
                     try {
@@ -137,7 +140,6 @@ export class Convert {
                           el[field.InternalName] = false;
                           break;
                         default:
-                          el[field.InternalName] = null;
                           break;
                       }
                     } catch (e) {
@@ -146,9 +148,6 @@ export class Convert {
 
                     break;
                   case "DateTime":
-                    if(el[field.InternalName] === ""){
-                      el[field.InternalName] = null;
-                    }
                     if (el[field.InternalName] !== null) {
 
                       if (typeof el[field.InternalName] === "string") {
@@ -176,9 +175,7 @@ export class Convert {
                     break;
 
                   case "URL":
-                    if (el[field.InternalName] === "") {
-                      el[field.InternalName] = null;
-                    } else {
+                    if (el[field.InternalName] !== null)  {
                       el[field.InternalName] = {
                         __metadata: { type: "SP.FieldUrlValue" },
                         Url: el[field.InternalName],
@@ -186,14 +183,17 @@ export class Convert {
                     }
                     break;
                   case "Number":
-                    if (el[field.InternalName] === "") {
-                      el[field.InternalName] = null;
-                    } else {
-                      try {
-                        el[field.InternalName] = parseInt(
-                          el[field.InternalName]
-                        );
-                      } catch (e) {}
+                    if(el[field.InternalName] !== null){
+                      if (!isNaN(el[field.InternalName])){
+                        try {
+                          el[field.InternalName] = parseInt(
+                            el[field.InternalName]
+                          );
+                        } catch (e) {el[field.InternalName] = "Darai errore";}
+                      }
+                      else{
+                        el[field.InternalName] = "Darai errore";
+                      }
                     }
                     break;
                   default:
